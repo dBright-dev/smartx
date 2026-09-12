@@ -1,0 +1,154 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:SmartX.WebApp.ViewModels"
+             xmlns:models="clr-namespace:SmartX.WebApp.Models"
+             xmlns:shapes="clr-namespace:Microsoft.Maui.Controls.Shapes;assembly=Microsoft.Maui.Controls"
+             x:Class="SmartX.WebApp.MainPage"
+             x:DataType="vm:MainViewModel"
+             BackgroundColor="#0F172A"
+             Title="Smart-X Gateway">
+
+    <ScrollView>
+        <VerticalStackLayout Spacing="20" Padding="24">
+
+            <!-- =========================== HERO =========================== -->
+            <VerticalStackLayout Spacing="6" Margin="0,20,0,0">
+                <Label Text="Smart-X"
+                       FontSize="44"
+                       FontAttributes="Bold"
+                       TextColor="#38BDF8"
+                       HorizontalOptions="Center" />
+                <Label Text="IoT Gateway Console"
+                       FontSize="16"
+                       TextColor="#94A3B8"
+                       HorizontalOptions="Center" />
+            </VerticalStackLayout>
+
+            <!-- ======================== STATUS CARD ======================== -->
+            <!-- Previously a Frame; now a Border with a rounded shape -->
+            <Border BackgroundColor="#1E293B"
+                    Stroke="#334155"
+                    StrokeThickness="1"
+                    Padding="18">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="14" />
+                </Border.StrokeShape>
+                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="14">
+                    <Label Grid.Column="0"
+                           Text="🛰️"
+                           FontSize="34"
+                           VerticalOptions="Center" />
+                    <VerticalStackLayout Grid.Column="1" Spacing="2">
+                        <Label Text="System status"
+                               FontSize="12"
+                               TextColor="#94A3B8" />
+                        <Label Text="Gateway online"
+                               FontSize="15"
+                               FontAttributes="Bold"
+                               TextColor="#F1F5F9" />
+                        <Label Text="1 Ingestion active"
+                               FontSize="12"
+                               TextColor="#38BDF8" />
+                    </VerticalStackLayout>
+                </Grid>
+            </Border>
+
+            <!-- ======================= PILLAR SECTION ====================== -->
+            <Label Text="Architectural pillars"
+                   FontSize="14"
+                   TextColor="#94A3B8"
+                   Margin="4,8,0,0" />
+
+            <VerticalStackLayout Spacing="14"
+                                 BindableLayout.ItemsSource="{Binding Pillars}">
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate x:DataType="models:Pillar">
+                        <!-- Pillar card: Border replaces the previous Frame -->
+                        <Border BackgroundColor="#1E293B"
+                                Stroke="{Binding AccentColor}"
+                                StrokeThickness="2"
+                                Padding="16">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="14" />
+                            </Border.StrokeShape>
+
+                            <Grid RowDefinitions="Auto,Auto,Auto"
+                                  ColumnDefinitions="Auto,*"
+                                  RowSpacing="10"
+                                  ColumnSpacing="14">
+
+                                <!-- Icon -->
+                                <Label Grid.Row="0" Grid.Column="0"
+                                       Grid.RowSpan="2"
+                                       Text="{Binding Icon}"
+                                       FontSize="40"
+                                       VerticalOptions="Center" />
+
+                                <!-- Title + status -->
+                                <VerticalStackLayout Grid.Row="0" Grid.Column="1" Spacing="2">
+                                    <Label Text="{Binding Title}"
+                                           FontSize="18"
+                                           FontAttributes="Bold"
+                                           TextColor="#F1F5F9" />
+                                    <Label Text="{Binding StatusText}"
+                                           FontSize="12"
+                                           FontAttributes="Bold"
+                                           TextColor="{Binding AccentColor}" />
+                                </VerticalStackLayout>
+
+                                <!-- Description -->
+                                <Label Grid.Row="1" Grid.Column="1"
+                                       Text="{Binding Description}"
+                                       FontSize="13"
+                                       TextColor="#94A3B8"
+                                       LineBreakMode="WordWrap" />
+
+                                <!-- Button row -->
+                                <Grid Grid.Row="2" Grid.Column="0"
+                                      Grid.ColumnSpan="2"
+                                      ColumnDefinitions="*">
+
+                                    <Button Text="Open pillar →"
+                                            IsVisible="{Binding IsEnabled}"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=NavigateToPillarCommand}"
+                                            CommandParameter="{Binding .}"
+                                            BackgroundColor="{Binding AccentColor}"
+                                            TextColor="#0F172A"
+                                            FontAttributes="Bold"
+                                            CornerRadius="10"
+                                            HeightRequest="44" />
+
+                                    <Button Text="Coming soon"
+                                            IsVisible="{Binding IsEnabled, Converter={StaticResource InverseBoolConverter}}"
+                                            IsEnabled="False"
+                                            BackgroundColor="#334155"
+                                            TextColor="#64748B"
+                                            CornerRadius="10"
+                                            HeightRequest="44" />
+                                </Grid>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </VerticalStackLayout>
+
+            <!-- ========================= FOOTER ========================= -->
+            <Label Text="SmartX Gateway"
+                   FontSize="11"
+                   TextColor="#475569"
+                   HorizontalOptions="Center"
+                   Margin="0,20,0,10" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
+
+<!--
+    References:
+      Microsoft. (2024). What is .NET MAUI?
+        https://learn.microsoft.com/en-us/dotnet/maui/what-is-maui?view=net-maui-10.0
+      Microsoft. (2025). .NET MAUI Shell pages.
+        https://learn.microsoft.com/en-us/dotnet/maui/fundamentals/shell/pages?view=net-maui-10.0
+      dotnet. (2022a). .NET MAUI Data Binding with MVVM & XAML [5 of 8].
+        https://youtu.be/5Qga2pniN78
+-->

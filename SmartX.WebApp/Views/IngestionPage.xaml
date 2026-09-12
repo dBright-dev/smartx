@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:SmartX.WebApp.ViewModels"
+             xmlns:models="clr-namespace:SmartX.WebApp.Models"
+             x:Class="SmartX.WebApp.Views.IngestionPage"
+             x:DataType="vm:IngestionViewModel"
+             Title="Sensor Ingestion">
+
+    <ScrollView>
+        <VerticalStackLayout Spacing="15" Padding="15">
+
+            <!-- Status banner (was a Frame) -->
+            <Border BackgroundColor="#F8FAFC"
+                    Stroke="{Binding StatusColor}"
+                    StrokeThickness="2"
+                    Padding="10">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="10" />
+                </Border.StrokeShape>
+                <Label Text="{Binding StatusMessage}"
+                       TextColor="{Binding StatusColor}"
+                       FontAttributes="Bold" />
+            </Border>
+
+            <!-- Registration form (was a Frame) -->
+            <Border BackgroundColor="#FFFFFF"
+                    Stroke="#2196F3"
+                    StrokeThickness="1"
+                    Padding="10">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="10" />
+                </Border.StrokeShape>
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="📝 Register New Device"
+                           FontSize="18" FontAttributes="Bold" TextColor="#2196F3" Padding="10"/>
+
+                    
+                    <Label Text="MAC Address"
+                        FontSize="12" TextColor="Gray" />
+                    <Border BackgroundColor="#FFFFFF"
+                        Stroke="Gainsboro"
+                        StrokeThickness="1"
+                        Padding="4">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="10" />
+                        </Border.StrokeShape>
+                        <Entry Placeholder="MAC Address"
+                           Text="{Binding NewDevice.MacAddress}" TextColor="#000000"/>
+                    </Border>
+
+                    <Label Text="Deployment Location"
+                        FontSize="12" TextColor="Gray" />
+                    <Border BackgroundColor="#FFFFFF"
+                        Stroke="Gainsboro"
+                        StrokeThickness="1"
+                        Padding="4">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="10" />
+                        </Border.StrokeShape>
+                        <Entry Placeholder="Deployment Location"
+                           Text="{Binding NewDevice.DeploymentLocation}" TextColor="#000000" />
+                    </Border>
+
+                    <Label Text="Zone"
+                        FontSize="12" TextColor="Gray" />
+                    <Border BackgroundColor="#FFFFFF"
+                        Stroke="Gainsboro"
+                        StrokeThickness="1"
+                        Padding="4">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="10" />
+                        </Border.StrokeShape>
+                        <Entry Placeholder="Zone"
+                           Text="{Binding NewDevice.Zone}" TextColor="#000000"/>
+                    </Border>
+
+                    <Label Text="Node ID"
+                        FontSize="12" TextColor="Gray" />
+                    <Border BackgroundColor="#FFFFFF"
+                        Stroke="Gainsboro"
+                        StrokeThickness="1"
+                        Padding="4">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="10" />
+                        </Border.StrokeShape>
+                        <Entry Placeholder="Node ID"
+                           Text="{Binding NewDevice.NodeId}" TextColor="#000000"/>
+                    </Border>
+
+
+                    <Label Text="Click and Select a Category"
+                        FontSize="12" TextColor="Gray" />
+                    <Border BackgroundColor="#FFFFFF"
+                        Stroke="Gainsboro"
+                        StrokeThickness="1"
+                        Padding="4">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="10" />
+                        </Border.StrokeShape>
+                        <Picker ItemsSource="{Binding Categories}" TextColor="#000000"/>
+                    </Border>
+                    
+                    <Button Text="Register"
+                            Command="{Binding RegisterDeviceCommand}"
+                            IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"
+                            BackgroundColor="#2196F3" TextColor="White" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- File upload (was a Frame) -->
+            <Border BackgroundColor="#FFFFFF"
+                    Stroke="#FF9800"
+                    StrokeThickness="1"
+                    Padding="10">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="10" />
+                </Border.StrokeShape>
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="📎 Attach Device File"
+                           FontSize="18" FontAttributes="Bold" TextColor="#FF9800" />
+
+                    <Entry Placeholder="Device MAC Address"
+                           Text="{Binding UploadMacAddress}" TextColor="#000000" />
+                    <Label Text="{Binding PickedFileName}"
+                           TextColor="Gray" FontSize="12" />
+
+                    <Button Text="Pick File"
+                            Command="{Binding PickFileCommand}"
+                            BackgroundColor="#FF9800" TextColor="White" />
+                    <Button Text="Upload"
+                            Command="{Binding UploadFileCommand}"
+                            BackgroundColor="#FF9800" TextColor="White" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Device list (was a Frame) -->
+            <Border BackgroundColor="#FFFFFF"
+                    Stroke="#4CAF50"
+                    StrokeThickness="1"
+                    Padding="10">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="10" />
+                </Border.StrokeShape>
+                <VerticalStackLayout Spacing="8">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Label Text="📋 Devices"
+                               FontSize="18" FontAttributes="Bold" TextColor="#4CAF50" />
+                        <Button Grid.Column="1" Text="🔄"
+                                Command="{Binding LoadDevicesCommand}"
+                                BackgroundColor="#4CAF50" TextColor="White"
+                                WidthRequest="40" HeightRequest="40" CornerRadius="20" />
+                    </Grid>
+
+                    <CollectionView ItemsSource="{Binding Devices}" HeightRequest="300">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="models:SensorDevice">
+                                <Grid Padding="5" ColumnDefinitions="*,Auto,Auto">
+                                    <VerticalStackLayout>
+                                        <Label Text="{Binding MacAddress}" FontAttributes="Bold" />
+                                        <Label Text="{Binding DeploymentLocation}"
+                                               FontSize="12" TextColor="Gray" />
+                                        <Label Text="{Binding NodeId}"
+                                               FontSize="11" TextColor="Blue" />
+                                    </VerticalStackLayout>
+
+                                    <Button Grid.Column="1" Text="📊"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:IngestionViewModel}}, Path=ViewReadingsCommand}"
+                                            CommandParameter="{Binding MacAddress}"
+                                            BackgroundColor="Transparent"
+                                            TextColor="#2196F3" FontSize="20" />
+
+                                    <Button Grid.Column="2" Text="📡"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:IngestionViewModel}}, Path=SendTestTelemetryCommand}"
+                                            CommandParameter="{Binding MacAddress}"
+                                            BackgroundColor="Transparent"
+                                            TextColor="#FF9800" FontSize="16" />
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </Border>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
+    
+<!--
+    References:
+      dotnet. (2022a). Data Binding with MVVM & XAML [5 of 8].
+        https://youtu.be/5Qga2pniN78
+      dotnet. (2022c). Accessing Platform Features in .NET MAUI [7 of 8].
+        https://youtu.be/gy7X1IZKeQQ
+-->

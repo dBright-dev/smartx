@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="SmartX.API/SmartX.API.csproj" />
+  <Project Path="SmartX.Client/SmartX.Client.csproj" Id="d0e1eb7a-6e4d-4d2a-b2a2-be73c248fd38" />
+  <Project Path="SmartX.WebApp/SmartX.WebApp.csproj">
+    <Deploy Solution="Debug|*" />
+  </Project>
+</Solution>

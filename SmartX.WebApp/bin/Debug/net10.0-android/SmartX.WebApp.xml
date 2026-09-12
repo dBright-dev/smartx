@@ -1,0 +1,158 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>SmartX.WebApp</name>
+    </assembly>
+    <members>
+        <member name="T:SmartX.WebApp.Converters.InverseBoolConverter">
+            <summary>
+            Converts a boolean to its inverse. Used in XAML to toggle visibility
+            between the "Open" and "Coming Soon" buttons (dotnet, 2022).
+            </summary>
+        </member>
+        <member name="T:SmartX.WebApp.ViewModels.IngestionViewModel">
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+        </member>
+        <member name="P:SmartX.WebApp.ViewModels.IngestionViewModel.NewDevice">
+            <inheritdoc cref="F:SmartX.WebApp.ViewModels.IngestionViewModel._newDevice"/>
+        </member>
+        <member name="P:SmartX.WebApp.ViewModels.IngestionViewModel.Devices">
+            <inheritdoc cref="F:SmartX.WebApp.ViewModels.IngestionViewModel._devices"/>
+        </member>
+        <member name="P:SmartX.WebApp.ViewModels.IngestionViewModel.Readings">
+            <inheritdoc cref="F:SmartX.WebApp.ViewModels.IngestionViewModel._readings"/>
+        </member>
+        <member name="P:SmartX.WebApp.ViewModels.IngestionViewModel.UploadMacAddress">
+            <inheritdoc cref="F:SmartX.WebApp.ViewModels.IngestionViewModel._uploadMacAddress"/>
+        </member>
+        <member name="P:SmartX.WebApp.ViewModels.IngestionViewModel.PickedFileName">
+            <inheritdoc cref="F:SmartX.WebApp.ViewModels.IngestionViewModel._pickedFileName"/>
+        </member>
+        <member name="P:SmartX.WebApp.ViewModels.IngestionViewModel.StatusMessage">
+            <inheritdoc cref="F:SmartX.WebApp.ViewModels.IngestionViewModel._statusMessage"/>
+        </member>
+        <member name="P:SmartX.WebApp.ViewModels.IngestionViewModel.StatusColor">
+            <inheritdoc cref="F:SmartX.WebApp.ViewModels.IngestionViewModel._statusColor"/>
+        </member>
+        <member name="P:SmartX.WebApp.ViewModels.IngestionViewModel.IsBusy">
+            <inheritdoc cref="F:SmartX.WebApp.ViewModels.IngestionViewModel._isBusy"/>
+        </member>
+        <member name="F:SmartX.WebApp.ViewModels.IngestionViewModel.loadDevicesCommand">
+            <summary>The backing field for <see cref="P:SmartX.WebApp.ViewModels.IngestionViewModel.LoadDevicesCommand"/>.</summary>
+        </member>
+        <member name="P:SmartX.WebApp.ViewModels.IngestionViewModel.LoadDevicesCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:SmartX.WebApp.ViewModels.IngestionViewModel.LoadDevicesAsync"/>.</summary>
+        </member>
+        <member name="F:SmartX.WebApp.ViewModels.IngestionViewModel.registerDeviceCommand">
+            <summary>The backing field for <see cref="P:SmartX.WebApp.ViewModels.IngestionViewModel.RegisterDeviceCommand"/>.</summary>
+        </member>
+        <member name="P:SmartX.WebApp.ViewModels.IngestionViewModel.RegisterDeviceCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:SmartX.WebApp.ViewModels.IngestionViewModel.RegisterDeviceAsync"/>.</summary>
+        </member>
+        <member name="F:SmartX.WebApp.ViewModels.IngestionViewModel.pickFileCommand">
+            <summary>The backing field for <see cref="P:SmartX.WebApp.ViewModels.IngestionViewModel.PickFileCommand"/>.</summary>
+        </member>
+        <member name="P:SmartX.WebApp.ViewModels.IngestionViewModel.PickFileCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:SmartX.WebApp.ViewModels.IngestionViewModel.PickFileAsync"/>.</summary>
+        </member>
+        <member name="F:SmartX.WebApp.ViewModels.IngestionViewModel.uploadFileCommand">
+            <summary>The backing field for <see cref="P:SmartX.WebApp.ViewModels.IngestionViewModel.UploadFileCommand"/>.</summary>
+        </member>
+        <member name="P:SmartX.WebApp.ViewModels.IngestionViewModel.UploadFileCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:SmartX.WebApp.ViewModels.IngestionViewModel.UploadFileAsync"/>.</summary>
+        </member>
+        <member name="F:SmartX.WebApp.ViewModels.IngestionViewModel.sendTestTelemetryCommand">
+            <summary>The backing field for <see cref="P:SmartX.WebApp.ViewModels.IngestionViewModel.SendTestTelemetryCommand"/>.</summary>
+        </member>
+        <member name="P:SmartX.WebApp.ViewModels.IngestionViewModel.SendTestTelemetryCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand`1"/> instance wrapping <see cref="M:SmartX.WebApp.ViewModels.IngestionViewModel.SendTestTelemetryAsync(System.String)"/>.</summary>
+        </member>
+        <member name="F:SmartX.WebApp.ViewModels.IngestionViewModel.viewReadingsCommand">
+            <summary>The backing field for <see cref="P:SmartX.WebApp.ViewModels.IngestionViewModel.ViewReadingsCommand"/>.</summary>
+        </member>
+        <member name="P:SmartX.WebApp.ViewModels.IngestionViewModel.ViewReadingsCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand`1"/> instance wrapping <see cref="M:SmartX.WebApp.ViewModels.IngestionViewModel.ViewReadingsAsync(System.String)"/>.</summary>
+        </member>
+        <member name="T:SmartX.WebApp.ViewModels.MainViewModel">
+            <inheritdoc/>
+        </member>
+        <member name="F:SmartX.WebApp.ViewModels.MainViewModel.navigateToPillarCommand">
+            <summary>The backing field for <see cref="P:SmartX.WebApp.ViewModels.MainViewModel.NavigateToPillarCommand"/>.</summary>
+        </member>
+        <member name="P:SmartX.WebApp.ViewModels.MainViewModel.NavigateToPillarCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand`1"/> instance wrapping <see cref="M:SmartX.WebApp.ViewModels.MainViewModel.NavigateToPillar(SmartX.WebApp.Models.Pillar)"/>.</summary>
+        </member>
+        <member name="T:SmartX.WebApp.Resource">
+            <summary>
+            Android Resource Designer class.
+            Exposes the Android Resource designer assembly into the project Namespace.
+            </summary>
+        </member>
+        <member name="T:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs">
+            <summary>
+            A helper type providing cached, reusable <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instances
+            for all properties generated with <see cref="T:CommunityToolkit.Mvvm.ComponentModel.ObservablePropertyAttribute"/>.
+            </summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.NewDevice">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "NewDevice" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.Devices">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "Devices" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.Readings">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "Readings" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.UploadMacAddress">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "UploadMacAddress" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.PickedFileName">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "PickedFileName" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.StatusMessage">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "StatusMessage" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.StatusColor">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "StatusColor" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.IsBusy">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "IsBusy" generated properties.</summary>
+        </member>
+        <member name="T:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs">
+            <summary>
+            A helper type providing cached, reusable <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instances
+            for all properties generated with <see cref="T:CommunityToolkit.Mvvm.ComponentModel.ObservablePropertyAttribute"/>.
+            </summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.NewDevice">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "NewDevice" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.Devices">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "Devices" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.Readings">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "Readings" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.UploadMacAddress">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "UploadMacAddress" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.PickedFileName">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "PickedFileName" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.StatusMessage">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "StatusMessage" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.StatusColor">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "StatusColor" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.IsBusy">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "IsBusy" generated properties.</summary>
+        </member>
+    </members>
+</doc>
