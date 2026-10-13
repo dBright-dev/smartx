@@ -143,3 +143,5 @@ namespace SmartX.API.DataStructures
             trackedUsers = _byUser.Count
         };
     } // (Microsoft, 2026)
+}
+
