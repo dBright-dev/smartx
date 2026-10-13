@@ -1,0 +1,32 @@
+# Smart-X Gateway — API + MVC client
+# Usage:  docker compose up --build
+#   API    → http://localhost:5042
+#   Client → http://localhost:5149
+# REFERENCE: Microsoft, 2026. Compose files in Docker.
+# [online] Available at: https://docs.docker.com/compose/
+# [Accessed 13 October 2026].
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: SmartX.API/Dockerfile
+    container_name: smartx-api
+    ports:
+      - "5042:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+
+  client:
+    build:
+      context: .
+      dockerfile: SmartX.Client/Dockerfile
+    container_name: smartx-client
+    ports:
+      - "5149:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      # Cross-container routing: the client reaches the API by service name.
+      - ApiSettings__BaseUrl=http://api:8080
+    depends_on:
+      - api
