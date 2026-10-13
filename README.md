@@ -49,6 +49,12 @@ dotnet run --project .\SmartX.Client --no-launch-profile --urls http://localhost
 Then browse to **http://localhost:5149** — the landing page shows
 **Pillar 2 → “Open Command Stream”** as *Active*, Pillar 3 stays disabled.
 
+> **.NET MAUI parity:** `SmartX.WebApp` mirrors the MVC client exactly — its
+> landing page also shows Pillar 2 as **Active** and opens
+> `Views/CommandStreamPage.xaml`, which talks to the same
+> `/api/command-stream` endpoints through `ICommandStreamClient`. Run it from
+> Visual Studio (F5) on the platform of your choice.
+
 > **Testing tip (PowerShell):** `curl.exe -d '{...}'` mangles the double quotes
 > inside JSON when PowerShell forwards the arguments, which produces
 > `400 Bad Request` with an empty body. Use the `Invoke-RestMethod` snippets
