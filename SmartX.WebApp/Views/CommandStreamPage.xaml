@@ -1,0 +1,324 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+    Part 2 — Real-Time Command Stream & History (MAUI twin of Views/CommandStream/Index.cshtml).
+    Panels map 1:1 to the required structures: ConcurrentQueue, PriorityQueue, Stack,
+    HashSet, Dictionary, SortedDictionary and the frequency-map suggestion engine.
+    REFERENCE: Microsoft, 2026. .NET MAUI Shell pages.
+    https://learn.microsoft.com/en-us/dotnet/maui/fundamentals/shell/pages [Accessed 13 October 2026].
+-->
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:SmartX.WebApp.ViewModels"
+             xmlns:models="clr-namespace:SmartX.WebApp.Models"
+             x:Class="SmartX.WebApp.Views.CommandStreamPage"
+             x:DataType="vm:CommandStreamViewModel"
+             BackgroundColor="#0F172A"
+             Title="Command Stream">
+
+    <ScrollView>
+        <VerticalStackLayout Spacing="16" Padding="20">
+
+            <!-- ========================= STATUS BAR ========================= -->
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                <Label Grid.Column="0"
+                       Text="{Binding StatusMessage}"
+                       FontSize="13"
+                       TextColor="{Binding StatusColor}"
+                       LineBreakMode="WordWrap"
+                       VerticalOptions="Center" />
+                <ActivityIndicator Grid.Column="1"
+                                   IsRunning="{Binding IsBusy}"
+                                   IsVisible="{Binding IsBusy}"
+                                   Color="#38BDF8"
+                                   VerticalOptions="Center" />
+            </Grid>
+
+            <!-- ======================== STAT CARDS ========================= -->
+            <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="10">
+                <Border Grid.Row="0" Grid.Column="0" BackgroundColor="#1E293B" Stroke="#334155" StrokeThickness="1" Padding="12">
+                    <Border.StrokeShape><RoundRectangle CornerRadius="12" /></Border.StrokeShape>
+                    <VerticalStackLayout Spacing="2">
+                        <Label Text="{Binding QueueSize}" FontSize="26" FontAttributes="Bold" TextColor="#38BDF8" HorizontalOptions="Center" />
+                        <Label Text="Telemetry queue" FontSize="11" TextColor="#94A3B8" HorizontalOptions="Center" />
+                    </VerticalStackLayout>
+                </Border>
+                <Border Grid.Row="0" Grid.Column="1" BackgroundColor="#1E293B" Stroke="#334155" StrokeThickness="1" Padding="12">
+                    <Border.StrokeShape><RoundRectangle CornerRadius="12" /></Border.StrokeShape>
+                    <VerticalStackLayout Spacing="2">
+                        <Label Text="{Binding PriorityAlertCount}" FontSize="26" FontAttributes="Bold" TextColor="#F87171" HorizontalOptions="Center" />
+                        <Label Text="Priority alerts" FontSize="11" TextColor="#94A3B8" HorizontalOptions="Center" />
+                    </VerticalStackLayout>
+                </Border>
+                <Border Grid.Row="1" Grid.Column="0" BackgroundColor="#1E293B" Stroke="#334155" StrokeThickness="1" Padding="12">
+                    <Border.StrokeShape><RoundRectangle CornerRadius="12" /></Border.StrokeShape>
+                    <VerticalStackLayout Spacing="2">
+                        <Label Text="{Binding CommandHistorySize}" FontSize="26" FontAttributes="Bold" TextColor="#CBD5E1" HorizontalOptions="Center" />
+                        <Label Text="History depth" FontSize="11" TextColor="#94A3B8" HorizontalOptions="Center" />
+                    </VerticalStackLayout>
+                </Border>
+                <Border Grid.Row="1" Grid.Column="1" BackgroundColor="#1E293B" Stroke="#334155" StrokeThickness="1" Padding="12">
+                    <Border.StrokeShape><RoundRectangle CornerRadius="12" /></Border.StrokeShape>
+                    <VerticalStackLayout Spacing="2">
+                        <Label Text="{Binding ActiveAlertCount}" FontSize="26" FontAttributes="Bold" TextColor="#FACC15" HorizontalOptions="Center" />
+                        <Label Text="Active (unique) alerts" FontSize="11" TextColor="#94A3B8" HorizontalOptions="Center" />
+                    </VerticalStackLayout>
+                </Border>
+                <Border Grid.Row="2" Grid.Column="0" BackgroundColor="#1E293B" Stroke="#334155" StrokeThickness="1" Padding="12">
+                    <Border.StrokeShape><RoundRectangle CornerRadius="12" /></Border.StrokeShape>
+                    <VerticalStackLayout Spacing="2">
+                        <Label Text="{Binding DeviceCount}" FontSize="26" FontAttributes="Bold" TextColor="#4ADE80" HorizontalOptions="Center" />
+                        <Label Text="Registered devices" FontSize="11" TextColor="#94A3B8" HorizontalOptions="Center" />
+                    </VerticalStackLayout>
+                </Border>
+                <Border Grid.Row="2" Grid.Column="1" BackgroundColor="#1E293B" Stroke="#334155" StrokeThickness="1" Padding="12">
+                    <Border.StrokeShape><RoundRectangle CornerRadius="12" /></Border.StrokeShape>
+                    <VerticalStackLayout Spacing="2">
+                        <Label Text="{Binding SearchEvents}" FontSize="26" FontAttributes="Bold" TextColor="#F1F5F9" HorizontalOptions="Center" />
+                        <Label Text="Search events learned" FontSize="11" TextColor="#94A3B8" HorizontalOptions="Center" />
+                    </VerticalStackLayout>
+                </Border>
+            </Grid>
+
+            <Button Text="Refresh dashboard"
+                    Command="{Binding RefreshCommand}"
+                    BackgroundColor="#334155"
+                    TextColor="#F1F5F9"
+                    CornerRadius="10"
+                    HeightRequest="42" />
+
+            <!-- ================== FIFO QUEUE (ConcurrentQueue) ================== -->
+            <Border BackgroundColor="#1E293B" Stroke="#38BDF8" StrokeThickness="1" Padding="14">
+                <Border.StrokeShape><RoundRectangle CornerRadius="14" /></Border.StrokeShape>
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Telemetry Queue — ConcurrentQueue&lt;T&gt; (FIFO)"
+                           FontSize="14" FontAttributes="Bold" TextColor="#38BDF8" />
+                    <Grid ColumnDefinitions="*,*,0.7*" ColumnSpacing="8">
+                        <Entry Grid.Column="0" Placeholder="device id" Text="{Binding EnqueueDeviceId}" FontSize="13" />
+                        <Entry Grid.Column="1" Placeholder="value" Text="{Binding EnqueueValue}" Keyboard="Numeric" FontSize="13" />
+                        <Entry Grid.Column="2" Placeholder="unit" Text="{Binding EnqueueUnit}" FontSize="13" />
+                    </Grid>
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                        <Button Grid.Column="0" Text="Enqueue"
+                                Command="{Binding EnqueueTelemetryCommand}"
+                                BackgroundColor="#38BDF8" TextColor="#0F172A"
+                                FontAttributes="Bold" CornerRadius="10" HeightRequest="42" />
+                        <Button Grid.Column="1" Text="▼ Drain next (FIFO)"
+                                Command="{Binding DequeueTelemetryCommand}"
+                                BackgroundColor="#334155" TextColor="#F1F5F9"
+                                CornerRadius="10" HeightRequest="42" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- ============== PRIORITY ALERTS (PriorityQueue) =================== -->
+            <Border BackgroundColor="#1E293B" Stroke="#F87171" StrokeThickness="1" Padding="14">
+                <Border.StrokeShape><RoundRectangle CornerRadius="14" /></Border.StrokeShape>
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Priority Alerts — PriorityQueue&lt;TElement,TPriority&gt;"
+                           FontSize="14" FontAttributes="Bold" TextColor="#F87171" />
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                        <Entry Grid.Column="0" Placeholder="device mac" Text="{Binding AlertMac}" FontSize="13" />
+                        <Picker Grid.Column="1"
+                                ItemsSource="{Binding Severities}"
+                                SelectedIndex="{Binding SelectedSeverityIndex}"
+                                Title="severity"
+                                TextColor="#F1F5F9" />
+                    </Grid>
+                    <Entry Placeholder="message (e.g. Power spike)" Text="{Binding AlertMessage}" FontSize="13" />
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                        <Button Grid.Column="0" Text="Raise alert"
+                                Command="{Binding RaiseAlertCommand}"
+                                BackgroundColor="#F87171" TextColor="#0F172A"
+                                FontAttributes="Bold" CornerRadius="10" HeightRequest="42" />
+                        <Button Grid.Column="1" Text="▼ Dequeue #1"
+                                Command="{Binding DequeueAlertCommand}"
+                                BackgroundColor="#334155" TextColor="#F1F5F9"
+                                CornerRadius="10" HeightRequest="42" />
+                    </Grid>
+                    <Label Text="Critical (1) always dequeues before Warning (2) / Info (3)."
+                           FontSize="11" TextColor="#94A3B8" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- ================ COMMAND HISTORY (Stack — undo) ================== -->
+            <Border BackgroundColor="#1E293B" Stroke="#334155" StrokeThickness="1" Padding="14">
+                <Border.StrokeShape><RoundRectangle CornerRadius="14" /></Border.StrokeShape>
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Command History &amp; Undo — Stack&lt;T&gt; (LIFO)"
+                           FontSize="14" FontAttributes="Bold" TextColor="#CBD5E1" />
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                        <Entry Grid.Column="0" Placeholder="device mac" Text="{Binding CommandMac}" FontSize="13" />
+                        <Entry Grid.Column="1" Placeholder="command" Text="{Binding CommandText}" FontSize="13" />
+                    </Grid>
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                        <Button Grid.Column="0" Text="Issue command"
+                                Command="{Binding IssueCommand}"
+                                BackgroundColor="#CBD5E1" TextColor="#0F172A"
+                                FontAttributes="Bold" CornerRadius="10" HeightRequest="42" />
+                        <Button Grid.Column="1" Text="↩ Undo last (pop)"
+                                Command="{Binding UndoCommand}"
+                                BackgroundColor="#334155" TextColor="#F1F5F9"
+                                CornerRadius="10" HeightRequest="42" />
+                    </Grid>
+                    <CollectionView ItemsSource="{Binding CommandHistory}"
+                                    HeightRequest="150"
+                                    EmptyView="No commands issued yet — the stack is empty.">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="models:ManualCommand">
+                                <Grid Padding="0,4" ColumnDefinitions="Auto,Auto,*" ColumnSpacing="8">
+                                    <Label Grid.Column="0" Text="🕒" FontSize="12" />
+                                    <Label Grid.Column="1"
+                                           Text="{Binding IssuedAtUtc, StringFormat='{0:HH:mm:ss}'}"
+                                           FontSize="12" TextColor="#94A3B8" />
+                                    <Label Grid.Column="2"
+                                           Text="{Binding Command}"
+                                           FontSize="12" TextColor="#F1F5F9" />
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                    <Label Text="Row 1 is the top of the stack — the command Undo reverts."
+                           FontSize="11" TextColor="#94A3B8" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- ================ ACTIVE ALERTS (HashSet — dedup) ================= -->
+            <Border BackgroundColor="#1E293B" Stroke="#FACC15" StrokeThickness="1" Padding="14">
+                <Border.StrokeShape><RoundRectangle CornerRadius="14" /></Border.StrokeShape>
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Active Alerts — HashSet&lt;T&gt; (duplicate suppression)"
+                           FontSize="14" FontAttributes="Bold" TextColor="#FACC15" />
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                        <Entry Grid.Column="0" Placeholder="device mac" Text="{Binding ActiveAlertMac}" FontSize="13" />
+                        <Entry Grid.Column="1" Placeholder="error code" Text="{Binding ActiveAlertCode}" FontSize="13" />
+                    </Grid>
+                    <Button Text="Raise active alert (twice to test dedup)"
+                            Command="{Binding RaiseActiveAlertCommand}"
+                            BackgroundColor="#FACC15" TextColor="#0F172A"
+                            FontAttributes="Bold" CornerRadius="10" HeightRequest="42" />
+                    <CollectionView ItemsSource="{Binding ActiveAlerts}"
+                                    HeightRequest="90"
+                                    EmptyView="No active alerts.">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="x:String">
+                                <Label Text="{Binding .}"
+                                       FontSize="12"
+                                       TextColor="#F1F5F9"
+                                       Margin="0,3" />
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- ============ SUGGESTED ACTIONS (predictive engine) ============== -->
+            <Border BackgroundColor="#1E293B" Stroke="#38BDF8" StrokeThickness="1" Padding="14">
+                <Border.StrokeShape><RoundRectangle CornerRadius="14" /></Border.StrokeShape>
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Suggested Actions — frequency map + sorting"
+                           FontSize="14" FontAttributes="Bold" TextColor="#38BDF8" />
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                        <Entry Grid.Column="0"
+                               Placeholder="e.g. Moisture Sensor B, then Pump A"
+                               Text="{Binding SearchTerm}"
+                               FontSize="13" />
+                        <Button Grid.Column="1"
+                                Text="Search"
+                                Command="{Binding SearchCommand}"
+                                BackgroundColor="#38BDF8" TextColor="#0F172A"
+                                FontAttributes="Bold" CornerRadius="10" />
+                    </Grid>
+                    <CollectionView ItemsSource="{Binding Suggestions}"
+                                    ItemsLayout="HorizontalList"
+                                    HeightRequest="40"
+                                    EmptyView="Search two terms in a row to see ranked follow-ups.">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="models:TermSuggestion">
+                                <Border BackgroundColor="#0EA5E9" Padding="10,6" Margin="0,0,8,0">
+                                    <Border.StrokeShape><RoundRectangle CornerRadius="16" /></Border.StrokeShape>
+                                    <HorizontalStackLayout Spacing="4">
+                                        <Label FontSize="12"
+                                               TextColor="#0F172A"
+                                               FontAttributes="Bold"
+                                               Text="{Binding Term}" />
+                                        <Label FontSize="12"
+                                               TextColor="#0F172A"
+                                               Text="{Binding Confidence, StringFormat='{0}%'}" />
+                                    </HorizontalStackLayout>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                    <Label Text="{Binding SuggestionSummary}"
+                           FontSize="11" TextColor="#94A3B8" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- ================= TIMELINE (SortedDictionary) ==================== -->
+            <Border BackgroundColor="#1E293B" Stroke="#334155" StrokeThickness="1" Padding="14">
+                <Border.StrokeShape><RoundRectangle CornerRadius="14" /></Border.StrokeShape>
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="Telemetry Timeline — SortedDictionary&lt;TKey,TValue&gt;"
+                           FontSize="14" FontAttributes="Bold" TextColor="#38BDF8" />
+                    <CollectionView ItemsSource="{Binding Timeline}"
+                                    HeightRequest="140"
+                                    EmptyView="No readings in the last 6 hours.">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="models:TimelineReading">
+                                <Grid Padding="0,3" ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="8">
+                                    <Label Grid.Column="0"
+                                           Text="{Binding Timestamp, StringFormat='{0:HH:mm:ss}'}"
+                                           FontSize="12" TextColor="#94A3B8" />
+                                    <Label Grid.Column="1"
+                                           Text="{Binding MacAddress}"
+                                           FontSize="12" TextColor="#F1F5F9" />
+                                    <Label Grid.Column="2"
+                                           Text="{Binding Value}"
+                                           FontSize="12" TextColor="#4ADE80" />
+                                    <Label Grid.Column="3"
+                                           Text="{Binding Unit}"
+                                           FontSize="12" TextColor="#94A3B8" />
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- =============== DEVICE REGISTRY (Dictionary O(1)) =============== -->
+            <Border BackgroundColor="#1E293B" Stroke="#334155" StrokeThickness="1" Padding="14">
+                <Border.StrokeShape><RoundRectangle CornerRadius="14" /></Border.StrokeShape>
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="Device Registry — Dictionary&lt;string,SensorDevice&gt; O(1)"
+                           FontSize="14" FontAttributes="Bold" TextColor="#4ADE80" />
+                    <CollectionView ItemsSource="{Binding Devices}"
+                                    HeightRequest="140"
+                                    EmptyView="No devices registered.">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="models:SensorDevice">
+                                <Grid Padding="0,3" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+                                    <Label Grid.Column="0" Text="📱" FontSize="12" />
+                                    <Label Grid.Column="1"
+                                           Text="{Binding MacAddress}"
+                                           FontSize="12" TextColor="#F1F5F9" />
+                                    <Label Grid.Column="2"
+                                           Text="{Binding DeploymentLocation}"
+                                           FontSize="12" TextColor="#94A3B8" />
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </Border>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
+
+<!--
+    References:
+      Microsoft. (2026). Views in .NET MAUI.
+        https://learn.microsoft.com/en-us/dotnet/maui/user-interface/views
+      Microsoft. (2026). Data binding in .NET MAUI.
+        https://learn.microsoft.com/en-us/dotnet/maui/fundamentals/data-binding
+-->
