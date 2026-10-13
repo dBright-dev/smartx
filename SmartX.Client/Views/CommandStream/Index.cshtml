@@ -1,0 +1,402 @@
+@model CommandStreamViewModel
+@*
+    Part 2 — Real-Time Command Stream & History dashboard.
+    Every panel maps 1:1 to a required data structure:
+      Telemetry Queue   -> ConcurrentQueue<T>          (FIFO)
+      Priority Alerts   -> PriorityQueue<TElement,TPriority>
+      Command History   -> Stack<T>                    (undo / LIFO)
+      Active Alerts     -> HashSet<T>                  (duplicate suppression)
+      Device Registry   -> Dictionary<TKey,TValue>     (O(1))
+      Timeline          -> SortedDictionary<TKey,TValue>
+      Suggested Actions -> frequency map + sorting     (predictive engine)
+    REFERENCE: Microsoft, 2026. Views in ASP.NET Core MVC.
+    [online] Available at:
+    https://learn.microsoft.com/en-us/aspnet/core/mvc/views/overview
+    [Accessed 13 October 2026].
+*@
+@{
+    ViewData["Title"] = "Command Stream";
+}
+
+<div class="d-flex justify-content-between align-items-center mt-3 mb-3 flex-wrap gap-2">
+    <div>
+        <h2 class="mb-0">Real-Time Command Stream &amp; History</h2>
+        <span class="text-muted small">Pillar 2 &mdash; live queues, overrides, history &amp; predictions</span>
+    </div>
+    <div class="text-end">
+        <span class="badge @(Model.Stats.ApiReachable ? "bg-success" : "bg-danger")">
+            @(Model.Stats.ApiReachable ? "API online" : "API offline")
+        </span>
+        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary btn-sm ms-2">&larr; Pillars</a>
+    </div>
+</div>
+
+@if (TempData["Toast"] is string toast)
+{
+    <div class="alert alert-info alert-dismissible fade show" role="alert">
+        @toast
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@* ---------- Aggregate counters (single /stats round-trip) ---------- *@
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-4 col-xl-2">
+        <div class="card text-center border-0 shadow-sm h-100">
+            <div class="card-body py-3">
+                <div class="fs-3 fw-bold text-primary">@Model.Stats.QueueSize</div>
+                <div class="text-muted small">Telemetry queue</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-xl-2">
+        <div class="card text-center border-0 shadow-sm h-100">
+            <div class="card-body py-3">
+                <div class="fs-3 fw-bold text-danger">@Model.Stats.PriorityAlertCount</div>
+                <div class="text-muted small">Priority alerts</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-xl-2">
+        <div class="card text-center border-0 shadow-sm h-100">
+            <div class="card-body py-3">
+                <div class="fs-3 fw-bold text-secondary">@Model.Stats.CommandHistorySize</div>
+                <div class="text-muted small">History depth</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-xl-2">
+        <div class="card text-center border-0 shadow-sm h-100">
+            <div class="card-body py-3">
+                <div class="fs-3 fw-bold text-warning">@Model.Stats.ActiveAlertCount</div>
+                <div class="text-muted small">Active (unique) alerts</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-xl-2">
+        <div class="card text-center border-0 shadow-sm h-100">
+            <div class="card-body py-3">
+                <div class="fs-3 fw-bold text-info">@Model.Stats.DeviceCount</div>
+                <div class="text-muted small">Registered devices</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-xl-2">
+        <div class="card text-center border-0 shadow-sm h-100">
+            <div class="card-body py-3">
+                <div class="fs-3 fw-bold text-dark">@Model.Stats.SearchEvents</div>
+                <div class="text-muted small">Search events learned</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    @* ---------- FIFO queue panel ---------- *@
+    <div class="col-lg-6">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-primary text-white">
+                Telemetry Queue &mdash; <code>ConcurrentQueue&lt;T&gt;</code> (FIFO)
+            </div>
+            <div class="card-body">
+                <form asp-controller="CommandStream" asp-action="EnqueueTelemetry" method="post" class="row g-2 align-items-end">
+                    <div class="col-md-5">
+                        <label class="form-label small mb-1">Device</label>
+                        <input name="deviceId" list="deviceList" class="form-control" placeholder="AA:BB:CC:00:00:01" required />
+                        <datalist id="deviceList">
+                            @foreach (var d in Model.Devices)
+                            {
+                                <option value="@d.MacAddress">@d.DeploymentLocation</option>
+                            }
+                        </datalist>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small mb-1">Value</label>
+                        <input name="value" type="number" step="any" class="form-control" value="23.5" required />
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small mb-1">Unit</label>
+                        <input name="unit" class="form-control" placeholder="%" />
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary w-100">Enqueue</button>
+                    </div>
+                </form>
+                <form asp-controller="CommandStream" asp-action="DequeueTelemetry" method="post" class="mt-3">
+                    <button type="submit" class="btn btn-outline-primary">&#x25BC; Drain next packet (FIFO)</button>
+                    <span class="text-muted small ms-2">First in &rarr; first out</span>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    @* ---------- Priority queue panel ---------- *@
+    <div class="col-lg-6">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-danger text-white">
+                Priority Alerts &mdash; <code>PriorityQueue&lt;TElement,TPriority&gt;</code>
+            </div>
+            <div class="card-body">
+                <form asp-controller="CommandStream" asp-action="RaiseAlert" method="post" class="row g-2 align-items-end">
+                    <div class="col-md-4">
+                        <label class="form-label small mb-1">Device</label>
+                        <input name="mac" list="deviceList" class="form-control" placeholder="AA:BB:CC:00:00:01" required />
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small mb-1">Severity</label>
+                        <select name="severity" class="form-select">
+                            <option value="1">Critical (1)</option>
+                            <option value="2" selected>Warning (2)</option>
+                            <option value="3">Info (3)</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small mb-1">Message</label>
+                        <input name="message" class="form-control" placeholder="Power spike" required />
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-danger w-100">Raise</button>
+                    </div>
+                </form>
+                <form asp-controller="CommandStream" asp-action="DequeueAlert" method="post" class="mt-3">
+                    <button type="submit" class="btn btn-outline-danger">&#x25BC; Dequeue highest-priority alert</button>
+                    <span class="text-muted small ms-2">Critical always beats Warning/Info</span>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    @* ---------- LIFO command history panel ---------- *@
+    <div class="col-lg-6">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-dark text-white">
+                Command History &amp; Undo &mdash; <code>Stack&lt;T&gt;</code> (LIFO)
+            </div>
+            <div class="card-body">
+                <form asp-controller="CommandStream" asp-action="IssueCommand" method="post" class="row g-2 align-items-end">
+                    <div class="col-md-5">
+                        <label class="form-label small mb-1">Device</label>
+                        <input name="mac" list="deviceList" class="form-control" placeholder="AA:BB:CC:00:00:02" required />
+                    </div>
+                    <div class="col-md-5">
+                        <label class="form-label small mb-1">Command</label>
+                        <input name="command" class="form-control" placeholder="Open valve" required />
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-dark w-100">Issue</button>
+                    </div>
+                </form>
+                <form asp-controller="CommandStream" asp-action="Undo" method="post" class="mt-3">
+                    <button type="submit" class="btn btn-outline-secondary">&#x21A9; Undo last command (pop the stack)</button>
+                </form>
+
+                <div class="table-responsive mt-3" style="max-height: 240px; overflow-y: auto;">
+                    <table class="table table-sm table-striped align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Issued (UTC)</th>
+                                <th>Device</th>
+                                <th>Command</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        @if (!Model.History.Any())
+                        {
+                            <tr><td colspan="4" class="text-muted small">No commands issued yet &mdash; the stack is empty.</td></tr>
+                        }
+                        else
+                        {
+                            var i = 1;
+                            @* Stack.ToArray() already returns newest-first (LIFO). *@
+                            foreach (var cmd in Model.History)
+                            {
+                                <tr>
+                                    <td>@i</td>
+                                    <td>@cmd.IssuedAtUtc.ToString("HH:mm:ss")</td>
+                                    <td><code>@cmd.MacAddress</code></td>
+                                    <td>@cmd.Command</td>
+                                </tr>
+                                i++;
+                            }
+                        }
+                        </tbody>
+                    </table>
+                </div>
+                <p class="text-muted small mt-2 mb-0">Row 1 is the top of the stack &mdash; the command the Undo button reverts.</p>
+            </div>
+        </div>
+    </div>
+
+    @* ---------- HashSet active alerts panel ---------- *@
+    <div class="col-lg-6">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-warning text-dark">
+                Active Alerts &mdash; <code>HashSet&lt;T&gt;</code> (duplicate suppression)
+            </div>
+            <div class="card-body">
+                <form asp-controller="CommandStream" asp-action="RaiseActiveAlert" method="post" class="row g-2 align-items-end">
+                    <div class="col-md-5">
+                        <label class="form-label small mb-1">Device</label>
+                        <input name="mac" list="deviceList" class="form-control" placeholder="AA:BB:CC:00:00:01" required />
+                    </div>
+                    <div class="col-md-5">
+                        <label class="form-label small mb-1">Error code</label>
+                        <input name="code" class="form-control" value="DISCONNECT" required />
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-warning w-100">Raise</button>
+                    </div>
+                </form>
+                <p class="text-muted small mt-2 mb-2">
+                    Raise the same code twice &mdash; the second response reports <code>wasDuplicate = true</code>
+                    and the set count does not grow.
+                </p>
+                <ul class="list-group list-group-flush" id="activeAlertList">
+                @if (!Model.ActiveAlerts.Any())
+                {
+                    <li class="list-group-item text-muted small">No active alerts.</li>
+                }
+                else
+                {
+                    foreach (var a in Model.ActiveAlerts)
+                    {
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <code>@a</code>
+                            <span class="badge bg-warning text-dark">active</span>
+                        </li>
+                    }
+                }
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* ---------- Predictive engine panel ---------- *@
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-header bg-dark text-white">
+        Suggested Actions &mdash; predictive engine (frequency map + sorting)
+    </div>
+    <div class="card-body">
+        <div class="row g-2 align-items-center">
+            <div class="col-md-6">
+                <div class="input-group">
+                    <input id="searchTerm" class="form-control"
+                           placeholder="Search e.g. Moisture Sensor B, then Pump A..." />
+                    <button class="btn btn-dark" type="button" onclick="runSearch()">Search &amp; suggest</button>
+                </div>
+            </div>
+            <div class="col-md-6 text-muted small">
+                Every search is recorded; the engine replies with the terms most often
+                searched <strong>after</strong> yours (with a confidence %).
+            </div>
+        </div>
+        <div id="suggestions" class="mt-3">
+            <p class="text-muted small mb-0">Start typing a search to see recommendations.</p>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    @* ---------- Sorted timeline ---------- *@
+    <div class="col-lg-6">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-info text-dark">
+                Telemetry Timeline &mdash; <code>SortedDictionary&lt;TKey,TValue&gt;</code>
+            </div>
+            <div class="card-body table-responsive" style="max-height: 300px; overflow-y: auto;">
+                <table class="table table-sm table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr><th>Timestamp (UTC)</th><th>Device</th><th class="text-end">Value</th><th>Unit</th></tr>
+                    </thead>
+                    <tbody>
+                    @if (!Model.Timeline.Any())
+                    {
+                        <tr><td colspan="4" class="text-muted small">No readings in the last 6 hours.</td></tr>
+                    }
+                    else
+                    {
+                        foreach (var r in Model.Timeline)
+                        {
+                            <tr>
+                                <td>@r.Timestamp.ToString("HH:mm:ss")</td>
+                                <td><code>@r.MacAddress</code></td>
+                                <td class="text-end">@r.Value</td>
+                                <td>@r.Unit</td>
+                            </tr>
+                        }
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    @* ---------- Device registry ---------- *@
+    <div class="col-lg-6">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-secondary text-white">
+                Device Registry &mdash; <code>Dictionary&lt;string,SensorDevice&gt;</code> O(1)
+            </div>
+            <div class="card-body table-responsive" style="max-height: 300px; overflow-y: auto;">
+                <table class="table table-sm table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr><th>MAC address</th><th>Location</th><th>Zone</th><th>Category</th></tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var d in Model.Devices)
+                    {
+                        <tr>
+                            <td><code>@d.MacAddress</code></td>
+                            <td>@d.DeploymentLocation</td>
+                            <td>@d.Zone</td>
+                            <td>@d.Category</td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Records the search server-side AND fetches ranked follow-ups.
+        async function runSearch() {
+            const term = document.getElementById('searchTerm').value.trim();
+            const box = document.getElementById('suggestions');
+            if (!term) {
+                box.innerHTML = '<p class="text-muted small mb-0">Enter a search term first.</p>';
+                return;
+            }
+            box.innerHTML = '<span class="spinner-border spinner-border-sm text-muted"></span> Analysing patterns...';
+            try {
+                const res = await fetch('/CommandStream/Search?term=' + encodeURIComponent(term));
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                const data = await res.json();
+                const items = data.suggestions || [];
+                let html = items.length
+                    ? items.map(s =>
+                        '<span class="badge bg-info text-dark me-2 mb-1" title="' + s.occurrences +
+                        ' occurrence(s) via ' + s.source + '">' + s.term + ' &middot; ' + s.confidence + '%</span>').join('')
+                    : '<p class="text-muted small mb-0">No suggestions yet &mdash; search a few terms first.</p>';
+                if (data.analytics) {
+                    html += '<p class="text-muted small mt-2 mb-0">Engine learned ' + data.analytics.recordedEvents +
+                        ' events across ' + data.analytics.distinctTerms + ' terms (' +
+                        data.analytics.distinctTransitions + ' transitions, ' +
+                        data.analytics.trackedUsers + ' users).</p>';
+                }
+                box.innerHTML = html;
+            } catch (e) {
+                box.innerHTML = '<p class="text-danger small mb-0">Could not reach the API &mdash; is SmartX.API running?</p>';
+            }
+        }
+        document.getElementById('searchTerm').addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') { e.preventDefault(); runSearch(); }
+        });
+    </script>
+}
