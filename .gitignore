@@ -52,3 +52,8 @@ publish/
 
 # Docker / local overrides
 docker-compose.override.yml
+
+# Local run artefacts (dotnet run output captured during testing)
+*.log
+*.err
+*.pid
