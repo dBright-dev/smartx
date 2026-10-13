@@ -1,8 +1,217 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Smart-X Gateway";
 }
 
+@*
+    Smart-X Landing Page - Architectural Pillar Selection
+    REFERENCE: Microsoft, 2026. Part 3, add a view to an ASP.NET Core MVC app.
+    [online] Microsoft Learn. Available at:
+    https://learn.microsoft.com/en-us/aspnet/core/tutorials/first-mvc-app/adding-view
+    [Accessed 12 September 2026].
+*@
+
+<style>
+    /* ============================================================
+       Landing Page Styles for Pillar Cards
+       REFERENCE: Telerik, 2026. ASP.NET MVC Cards - Telerik UI for ASP.NET MVC.
+       [online] Available at:
+       https://www.telerik.com/aspnet-mvc/documentation/html-helpers/layout/card/overview
+       [Accessed 12 September 2026].
+       ============================================================ */
+    .pillar-container {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        padding: 3rem 1rem;
+        flex-wrap: wrap;
+    }
+
+    .pillar-card {
+        width: 320px;
+        border-radius: 16px;
+        border: 2px solid #e0e0e0;
+        padding: 2rem 1.5rem;
+        text-align: center;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        background-color: #ffffff;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .pillar-card:not(.disabled):hover {
+        transform: translateY(-6px);
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+        border-color: #0d6efd;
+    }
+
+    /* Disabled pillar styling - visually distinct and non-interactive */
+    /* REFERENCE: DevExpress, 2026. CardViewBuilder<T>.Disabled(Boolean) Method.
+       [online] Available at:
+       https://docs.devexpress.com/AspNetCore/401122/DevExtreme.AspNet.Core/DevExtreme.AspNet.Mvc.CardViewBuilder-1.Disabled(System.Boolean)
+       [Accessed 12 September 2026]. */
+    .pillar-card.disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+        border-style: dashed;
+        position: relative;
+    }
+
+    .pillar-card.disabled:hover {
+        transform: none;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    }
+
+    .pillar-icon {
+        font-size: 3.5rem;
+        margin-bottom: 1rem;
+        color: #0d6efd;
+    }
+
+    .pillar-card.disabled .pillar-icon {
+        color: #6c757d;
+    }
+
+    .pillar-title {
+        font-size: 1.15rem;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+        color: #212529;
+    }
+
+    .pillar-description {
+        font-size: 0.9rem;
+        color: #6c757d;
+        margin-bottom: 1.5rem;
+        line-height: 1.5;
+    }
+
+    .pillar-badge {
+        display: inline-block;
+        padding: 0.35rem 1rem;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .badge-active {
+        background-color: #d1e7dd;
+        color: #0f5132;
+    }
+
+    .badge-disabled {
+        background-color: #f8d7da;
+        color: #842029;
+    }
+
+    .pillar-card .btn {
+        width: 100%;
+        margin-top: 0.5rem;
+    }
+</style>
+
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <h1 class="display-5 fw-bold mt-4">Smart-X Gateway</h1>
+    <p class="lead text-muted">
+        Select an architectural pillar to begin managing your IoT ecosystem.
+    </p>
+</div>
+
+@*
+    Three architectural pillar cards rendered using a flex container.
+    REFERENCE: Telerik, 2026. ASP.NET MVC Cards.
+    [online] Available at:
+    https://www.telerik.com/aspnet-mvc/documentation/html-helpers/layout/card/overview
+    [Accessed 12 September 2026].
+*@
+<div class="pillar-container">
+
+    @* ============================================================
+       PILLAR 1: Sensor Data Ingestion and Telemetry (ACTIVE)
+       REFERENCE: Microsoft, 2026. Accessing your model's data from a controller.
+       [online] Microsoft Learn. Available at:
+       https://learn.microsoft.com/en-us/aspnet/mvc/overview/older-versions/getting-started-with-aspnet-mvc3/cs/accessing-your-models-data-from-a-controller
+       [Accessed 12 September 2026].
+       ============================================================ *@
+    <div class="pillar-card">
+        <div>
+            <div class="pillar-icon">&#x1F4E1;</div>
+            <h2 class="pillar-title">Sensor Data Ingestion &amp; Telemetry</h2>
+            <p class="pillar-description">
+                Register sensors, ingest multi-typed telemetry packets, and
+                visualise live data streams from your IoT mesh network.
+            </p>
+        </div>
+        <div>
+            <span class="pillar-badge badge-active">Active</span>
+            @*
+                Navigation link to the Sensor Ingestion module.
+                REFERENCE: C# Corner, 2024. Views in ASP.NET MVC.
+                [online] Available at:
+                https://www.c-sharpcorner.com/article/views-in-asp-net-mvc
+                [Accessed 12 September 2026].
+            *@
+            <a asp-controller="Sensors" asp-action="Index"
+               class="btn btn-primary btn-lg mt-3">
+                Open Telemetry Dashboard
+            </a>
+        </div>
+    </div>
+
+    @* ============================================================
+       PILLAR 2: Real-Time Command Stream and History (DISABLED)
+       Part 2 - Not yet implemented.
+       REFERENCE: Balliauw, M., 2009. Supporting multiple submit buttons
+       on an ASP.NET MVC view. [blog] 26 November. Available at:
+       https://blog.maartenballiauw.be/posts/2009-11-26-supporting-multiple-submit-buttons-on-an-aspnet-mvc-view/
+       [Accessed 12 September 2026].
+       ============================================================ *@
+    <div class="pillar-card disabled">
+        <div>
+            <div class="pillar-icon">&#x1F4CA;</div>
+            <h2 class="pillar-title">Real-Time Command Stream &amp; History</h2>
+            <p class="pillar-description">
+                Monitor live command queues, issue manual override commands,
+                and review the history of all device interactions.
+            </p>
+        </div>
+        <div>
+            <span class="pillar-badge badge-disabled">Coming in Part 2</span>
+            <button class="btn btn-secondary btn-lg mt-3" disabled
+                    title="This module will be implemented in Part 2.">
+                Not Yet Available
+            </button>
+        </div>
+    </div>
+
+    @* ============================================================
+       PILLAR 3: Network Topology and Mesh Routing (DISABLED)
+       Final PoE - Not yet implemented.
+       REFERENCE: Microsoft, 2026. ASP.NET Core MVC Views.
+       [online] Available at:
+       https://learn.microsoft.com/en-us/aspnet/core/mvc/views/overview
+       [Accessed 12 September 2026].
+       ============================================================ *@
+    <div class="pillar-card disabled">
+        <div>
+            <div class="pillar-icon">&#x1F310;</div>
+            <h2 class="pillar-title">Network Topology &amp; Mesh Routing</h2>
+            <p class="pillar-description">
+                Visualise the mesh network graph, analyse routing paths,
+                and calculate minimum spanning trees for efficient data hops.
+            </p>
+        </div>
+        <div>
+            <span class="pillar-badge badge-disabled">Coming in Final PoE</span>
+            <button class="btn btn-secondary btn-lg mt-3" disabled
+                    title="This module will be implemented in the final PoE.">
+                Not Yet Available
+            </button>
+        </div>
+    </div>
+
 </div>

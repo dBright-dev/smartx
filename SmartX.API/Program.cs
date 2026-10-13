@@ -35,8 +35,34 @@ internal class Program
         
         app.UseCors();
         app.UseHttpsRedirection();
-        
 
+        // -------- Health check endpoint --------
+        // Lightweight liveness probe. Returns 200 OK when the API can reach its DbContext.
+        // REFERENCE: Microsoft, 2026. Health checks in ASP.NET Core.
+        // [online] Available at:
+        // https://learn.microsoft.com/en-us/aspnet/core/host-and-deploy/health-checks
+        // [Accessed 12 September 2026].
+        app.MapGet("/health", async (TelemetryContext db) =>
+        {
+            try
+            {
+                // Cheap DB round-trip proves the in-memory store is responsive.
+                _ = await db.Devices.CountAsync();
+                return TypedResults.Ok(new
+                {
+                    status = "Healthy",
+                    timestampUtc = DateTime.UtcNow,
+                    database = "Connected"
+                });
+            }
+            catch (Exception ex)
+            {
+                return Results.Problem(
+                    title: "Health check failed",
+                    detail: ex.Message,
+                    statusCode: StatusCodes.Status503ServiceUnavailable);
+            }
+        });
 
         // Endpoint groups. Using MapGroup reduces repetitive URL prefixes and lets us
         // customise the whole group in one place (Microsoft, 2026c).

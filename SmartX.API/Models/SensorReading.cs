@@ -1,7 +1,12 @@
-﻿namespace SmartX.API.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace SmartX.API.Models
 {
     public class SensorReading
     {
+        // Primary key for EF Core
+        [Key]
+        public int Id { get; set; }
         public DateTime Timestamp { get; set; }
         public double Value { get; set; }
         public string Unit { get; set; } = string.Empty;

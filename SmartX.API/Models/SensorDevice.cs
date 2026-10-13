@@ -1,7 +1,11 @@
-﻿namespace SmartX.API.Models
+﻿using System;
+using System.ComponentModel.DataAnnotations;
+
+namespace SmartX.API.Models
 {
     public class SensorDevice
     {
+        [Key]
         public string MacAddress { get; set; } = string.Empty;
         public string DeploymentLocation { get; set; } = string.Empty;
         public string Zone { get; set; } = string.Empty;
