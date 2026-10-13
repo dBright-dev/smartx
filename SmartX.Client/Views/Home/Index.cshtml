@@ -163,14 +163,14 @@
     </div>
 
     @* ============================================================
-       PILLAR 2: Real-Time Command Stream and History (DISABLED)
-       Part 2 - Not yet implemented.
-       REFERENCE: Balliauw, M., 2009. Supporting multiple submit buttons
-       on an ASP.NET MVC view. [blog] 26 November. Available at:
-       https://blog.maartenballiauw.be/posts/2009-11-26-supporting-multiple-submit-buttons-on-an-aspnet-mvc-view/
-       [Accessed 12 September 2026].
+       PILLAR 2: Real-Time Command Stream and History (NOW ACTIVE)
+       Part 2 - command queues, undo stack, sets and predictions.
+       REFERENCE: Microsoft, 2026. Tag helpers in ASP.NET Core.
+       [online] Available at:
+       https://learn.microsoft.com/en-us/aspnet/core/mvc/views/tag-helpers/overview
+       [Accessed 13 October 2026].
        ============================================================ *@
-    <div class="pillar-card disabled">
+    <div class="pillar-card">
         <div>
             <div class="pillar-icon">&#x1F4CA;</div>
             <h2 class="pillar-title">Real-Time Command Stream &amp; History</h2>
@@ -180,11 +180,11 @@
             </p>
         </div>
         <div>
-            <span class="pillar-badge badge-disabled">Coming in Part 2</span>
-            <button class="btn btn-secondary btn-lg mt-3" disabled
-                    title="This module will be implemented in Part 2.">
-                Not Yet Available
-            </button>
+            <span class="pillar-badge badge-active">Active</span>
+            <a asp-controller="CommandStream" asp-action="Index"
+               class="btn btn-primary btn-lg mt-3">
+                Open Command Stream
+            </a>
         </div>
     </div>
 
