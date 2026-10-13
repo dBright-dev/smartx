@@ -33,11 +33,30 @@ namespace SmartX.WebApp
                 return handler;
             });
 
+            // ---- Part 2: typed client for /api/command-stream ----
+            // REFERENCE: Microsoft, 2026. Make HTTP requests using IHttpClientFactory.
+            // https://learn.microsoft.com/en-us/dotnet/core/extensions/httpclient-factory
+            builder.Services.AddHttpClient<ICommandStreamClient, CommandStreamClient>(client =>
+            {
+                client.BaseAddress = new Uri(ApiConstants.BaseUrl);
+                client.Timeout = TimeSpan.FromSeconds(30);
+            }).ConfigurePrimaryHttpMessageHandler(() =>
+            {
+                var handler = new HttpClientHandler();
+#if DEBUG
+                handler.ServerCertificateCustomValidationCallback =
+                    (msg, cert, chain, errors) => true;
+#endif
+                return handler;
+            });
+
             builder.Services.AddSingleton<MainViewModel>();
             builder.Services.AddTransient<IngestionViewModel>();
+            builder.Services.AddTransient<CommandStreamViewModel>();
 
             builder.Services.AddTransient<MainPage>();
             builder.Services.AddTransient<IngestionPage>();
+            builder.Services.AddTransient<CommandStreamPage>();
 
 
 #if DEBUG

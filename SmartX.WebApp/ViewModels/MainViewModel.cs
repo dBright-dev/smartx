@@ -15,7 +15,7 @@ namespace SmartX.WebApp.ViewModels
         public MainViewModel()
         {
             // Pillar 1: Sensor Data Ingestion and Telemetry - ACTIVE (Part 1)
-            // Pillar 2: Real-Time Command Stream - DISABLED (Part 2)
+            // Pillar 2: Real-Time Command Stream - ACTIVE (Part 2)
             // Pillar 3: Network Topology and Mesh Routing - DISABLED (Final PoE)
             Pillars = new ObservableCollection<Pillar>
             {
@@ -30,10 +30,10 @@ namespace SmartX.WebApp.ViewModels
                 new Pillar
                 {
                     Title = "Real-Time Command Stream",
-                    Description = "Comming Soon - Stay Tuned",
+                    Description = "Live queues, manual overrides, undo history and suggestions",
                     Icon = "⚡",
-                    IsEnabled = false,
-                    Route = string.Empty
+                    IsEnabled = true,
+                    Route = "commandstream"
                 },
                 new Pillar
                 {
